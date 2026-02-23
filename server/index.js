@@ -54,10 +54,6 @@ pool.query(`
 .then(() => console.log("Spins table ready"))
 .catch(err => console.error("Error creating spins table:", err))
 
-app.get('/', (req, res) => {
-  res.send('Backend работает ')
-})
-
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()')
@@ -102,6 +98,9 @@ app.post('/auth', async (req, res) => {
   try {
     const { initData } = req.body
 
+    console.log("INIT DATA:", initData)
+    console.log("BOT TOKEN:", process.env.BOT_TOKEN)
+
     if (!initData || !verifyTelegramData(initData)) {
       return res.status(403).json({ error: "Invalid Telegram data" })
     }
@@ -141,57 +140,32 @@ app.post('/spin', async (req, res) => {
       [telegram_id]
     )
 
-     if (userResult.rows.length === 0) {
-      await client.query('ROLLBACK')
-      return res.status(404).json({ error: "User not found" })
-    }
-
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" })
     }
 
     const user = userResult.rows[0]
 
-    let cost = 0
-    let minWin = 0
-    let maxWin = 0
-
-    if (case_type === "cheap") {
-      cost = 100
-      minWin = 50
-      maxWin = 150
-    } else if (case_type === "medium") {
-      cost = 200
-      minWin = 100
-      maxWin = 400
-    } else if (case_type === "expensive") {
-      cost = 500
-      minWin = 100
-      maxWin = 700
-    } else {
-      return res.status(400).json({ error: "Invalid case type" })
-    }
+    let cost = 100
+    let minWin = 50
+    let maxWin = 150
 
     if (user.balance < cost) {
-      await client.query('ROLLBACK')
       return res.status(400).json({ error: "Not enough balance" })
     }
 
     const win = Math.floor(Math.random() * (maxWin - minWin + 1)) + minWin
     const newBalance = user.balance - cost + win
-    console.log("INSERTING SPIN:", telegram_id, case_type, cost, win)
 
-    // обновляем баланс
     await pool.query(
       'UPDATE users SET balance = $1 WHERE telegram_id = $2',
       [newBalance, telegram_id]
     )
 
-    // записываем историю
     await pool.query(
-  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
-  [String(telegram_id), case_type, cost, win]
-  )
+      'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
+      [String(telegram_id), case_type, cost, win]
+    )
 
     res.json({
       case_type,
@@ -201,10 +175,7 @@ app.post('/spin', async (req, res) => {
     })
 
   } catch (err) {
-    await client.query('ROLLBACK')
     res.status(500).json({ error: err.message })
-  } finally {
-    client.release()
   }
 })
 
