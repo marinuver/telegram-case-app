@@ -12,42 +12,55 @@
   <button onclick="spin()">Крутить дешёвый кейс</button>
 
   <script>
-    const tg = window.Telegram.WebApp
-    tg.expand()
+  const tg = window.Telegram.WebApp
+  tg.expand()
 
-    async function auth() {
-      const response = await fetch("/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          initData: tg.initData
-        })
+  let currentUser = null
+
+  async function auth() {
+    const response = await fetch("/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        initData: tg.initData
       })
+    })
 
-      const data = await response.json()
-      document.getElementById("balance").innerText =
-        "Баланс: " + data.balance
+    const data = await response.json()
+
+    currentUser = data
+
+    document.getElementById("balance").innerText =
+      "Баланс: " + data.balance
+  }
+
+  async function spin() {
+    if (!currentUser) return
+
+    const response = await fetch("/spin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        telegram_id: currentUser.telegram_id,
+        case_type: "cheap"
+      })
+    })
+
+    const data = await response.json()
+
+    if (data.error) {
+      alert(data.error)
+      return
     }
 
-    async function spin() {
-      const user = tg.initDataUnsafe.user
+    alert("Выигрыш: " + data.win)
 
-      const response = await fetch("/spin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          telegram_id: user.id,
-          case_type: "cheap"
-        })
-      })
+    document.getElementById("balance").innerText =
+      "Баланс: " + data.new_balance
+  }
 
-      const data = await response.json()
-      alert("Выигрыш: " + data.win)
-      auth()
-    }
-
-    auth()
-  </script>
+  auth()
+</script>
 
 </body>
 </html>
