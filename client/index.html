@@ -130,6 +130,15 @@
   margin-bottom: 8px;
   border-radius: 10px;
 }
+/* ===== ВКЛАДКИ ===== */
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}
   </style>
 </head>
 
@@ -185,10 +194,11 @@
 
   <script>
 function openTab(tabId) {
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.classList.remove("active")
-  })
+   // скрываем все вкладки
+  const tabs = document.querySelectorAll(".tab")
+  tabs.forEach(tab => tab.classList.remove("active"))
 
+  // показываем нужную
   document.getElementById(tabId).classList.add("active")
 }
 
@@ -208,7 +218,7 @@ function openTab(tabId) {
       document.getElementById("balance").innerText = data.balance
     }
 
-    async function spin(caseType) {
+    window.spin = async function(caseType) {
         const currentBalance =
   parseInt(document.getElementById("balance").innerText)
 
