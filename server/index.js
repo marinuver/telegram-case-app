@@ -57,8 +57,14 @@ app.get('/history/:telegram_id', async (req, res) => {
     const { telegram_id } = req.params
 
     const result = await pool.query(
-      'SELECT * FROM spins WHERE telegram_id = $1 ORDER BY created_at DESC',
-      [String(telegram_id)]
+      `
+      SELECT *
+      FROM spins
+      WHERE telegram_id = $1
+      ORDER BY created_at DESC
+      LIMIT 20
+      `,
+      [telegram_id]
     )
 
     res.json(result.rows)
