@@ -159,6 +159,10 @@ app.post('/spin', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+  await pool.query(
+  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
+  [telegram_id, case_type, cost, win]
+)
 })
 
 async function initDB() {
