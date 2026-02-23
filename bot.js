@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-const BOT_TOKEN = '7601773904:AAHo2-ag-xMI9dbKgXrvYjPy2nsoQw-Uumg';
-const WEB_APP_URL = 'https://nonpsychologically-sulcate-jalen.ngrok-free.dev';
+const BOT_TOKEN = '7906044844:AAHdCBQI6TrmgL6qdTuN-iZNjh2Vr_X8RSs';
+const WEB_APP_URL = 'https://sdfjklghluksdfjhgk.ru';
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 

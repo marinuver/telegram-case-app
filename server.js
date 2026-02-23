@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const BOT_TOKEN = '7906044844:AAHdCBQI6TrmgL6qdTuN-iZNjh2Vr_X8RSs';
-const WEB_APP_URL = 'https://nonpsychologically-sulcate-jalen.ngrok-free.dev';
+const WEB_APP_URL = 'https://sdfjklghluksdfjhgk.ru';
 const SUPER_ADMIN_TG_ID = 1658774787;
 
 app.use(cors({ origin: '*', credentials: true }));
