@@ -3,13 +3,12 @@ const express = require('express')
 const crypto = require('crypto')
 const cors = require('cors')
 const { Pool } = require('pg')
+const PORT = process.env.PORT || 3000
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.static('client'))
-
-const PORT = process.env.PORT || 3000
 
 function verifyTelegramData(initData) {
   const secret = crypto
@@ -232,5 +231,5 @@ async function initDB() {
 initDB()
 
 app.listen(PORT, () => {
-console.log('Server started on port ${PORT}')
+  console.log(`Server started on port ${PORT}`)
 })
