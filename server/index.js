@@ -163,6 +163,17 @@ app.post('/spin', async (req, res) => {
   'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
   [telegram_id, case_type, cost, win]
 )
+await pool.query(
+  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
+  [telegram_id, case_type, cost, win]
+)
+
+res.json({
+  case_type,
+  cost,
+  win,
+  new_balance: newBalance
+})
 })
 
 async function initDB() {
