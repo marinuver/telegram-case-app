@@ -141,12 +141,18 @@ app.post('/spin', async (req, res) => {
     }
 
     const win = Math.floor(Math.random() * (maxWin - minWin + 1)) + minWin
-
     const newBalance = user.balance - cost + win
 
+    // обновляем баланс
     await pool.query(
       'UPDATE users SET balance = $1 WHERE telegram_id = $2',
       [newBalance, telegram_id]
+    )
+
+    // записываем историю
+    await pool.query(
+      'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
+      [telegram_id, case_type, cost, win]
     )
 
     res.json({
@@ -159,21 +165,6 @@ app.post('/spin', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
-  await pool.query(
-  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
-  [telegram_id, case_type, cost, win]
-)
-await pool.query(
-  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
-  [telegram_id, case_type, cost, win]
-)
-
-res.json({
-  case_type,
-  cost,
-  win,
-  new_balance: newBalance
-})
 })
 
 async function initDB() {
