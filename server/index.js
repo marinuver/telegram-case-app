@@ -58,7 +58,7 @@ app.get('/history/:telegram_id', async (req, res) => {
 
     const result = await pool.query(
       'SELECT * FROM spins WHERE telegram_id = $1 ORDER BY created_at DESC',
-      [telegram_id]
+      [String(telegram_id)]
     )
 
     res.json(result.rows)
@@ -152,9 +152,9 @@ app.post('/spin', async (req, res) => {
 
     // записываем историю
     await pool.query(
-      'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
-      [telegram_id, case_type, cost, win]
-    )
+  'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
+  [String(telegram_id), case_type, cost, win]
+  )
 
     res.json({
       case_type,
