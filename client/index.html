@@ -63,6 +63,34 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+    #case {
+  margin: 20px 0;
+  height: 100px;
+  background: #1f1f30;
+  border-radius: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 42px;
+  overflow: hidden;
+}
+
+#result {
+  transition: transform 0.3s ease;
+}
+
+/* класс, который включается во время крутки */
+.spin-animation {
+  animation: pulse 0.2s infinite alternate;
+}
+
+/* сама анимация */
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
   </style>
 </head>
 
@@ -71,7 +99,12 @@
   <div class="card">
     <h1>🎰 Case Game</h1>
     <p id="balance">Загрузка...</p>
-    <button onclick="spin()">Крутить дешёвый кейс</button>
+
+    <div id="case">
+        <div id="result">🎁</div>
+    </div>
+
+    <button id="spinBtn" onclick="spin()">Крутить кейс</button>
   </div>
 
   <script>
@@ -93,21 +126,55 @@
     }
 
     async function spin() {
-      const user = tg.initDataUnsafe.user
+  const user = tg.initDataUnsafe.user
+  const resultBlock = document.getElementById("result")
+  const spinBtn = document.getElementById("spinBtn")
 
-      const response = await fetch("/spin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          telegram_id: user.id,
-          case_type: "cheap"
-        })
-      })
+  // 1️⃣ Блокируем кнопку
+  spinBtn.disabled = true
 
-      const data = await response.json()
-      alert("Выигрыш: " + data.win)
-      auth()
-    }
+  const items = ["💎", "🪙", "💰", "🎁", "⭐", "🔥"]
+
+  // 2️⃣ Включаем анимацию пульсации
+  resultBlock.classList.add("spin-animation")
+
+  // 3️⃣ Запускаем визуальную прокрутку
+  let counter = 0
+  const interval = setInterval(() => {
+    resultBlock.innerText = items[Math.floor(Math.random() * items.length)]
+    counter++
+  }, 100)
+
+  // 4️⃣ Отправляем запрос на сервер
+  const response = await fetch("/spin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      telegram_id: user.id,
+      case_type: "cheap"
+    })
+  })
+
+  const data = await response.json()
+
+  // 5️⃣ Через 1.5 секунды показываем реальный результат
+  setTimeout(() => {
+    clearInterval(interval)
+    resultBlock.classList.remove("spin-animation")
+
+    resultBlock.innerText = data.win + " 🪙"
+
+    // Эффект увеличения
+    resultBlock.style.transform = "scale(1.4)"
+
+    setTimeout(() => {
+      resultBlock.style.transform = "scale(1)"
+      spinBtn.disabled = false
+      auth() // обновляем баланс
+    }, 400)
+
+  }, 1500)
+}
 
     auth()
   </script>
