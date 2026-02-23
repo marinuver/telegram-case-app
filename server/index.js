@@ -129,48 +129,51 @@ app.post('/auth', async (req, res) => {
 
 app.post('/spin', async (req, res) => {
   try {
-    const { telegram_id, case_type } = req.body
-
-    if (!telegram_id || !case_type) {
-      return res.status(400).json({ error: "telegram_id and case_type required" })
-    }
+    const { telegram_id } = req.body
 
     const userResult = await pool.query(
       'SELECT * FROM users WHERE telegram_id = $1',
       [telegram_id]
     )
 
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" })
-    }
-
     const user = userResult.rows[0]
+    const cost = 100
 
-    let cost = 100
-    let minWin = 50
-    let maxWin = 150
-
-    if (user.balance < cost) {
-      return res.status(400).json({ error: "Not enough balance" })
+    if (!user || user.balance < cost) {
+      return res.status(400).json({ error: "Недостаточно средств" })
     }
 
-    const win = Math.floor(Math.random() * (maxWin - minWin + 1)) + minWin
-    const newBalance = user.balance - cost + win
+    const items = [
+      { emoji: "🪙", name: "Монета", value: 5, rarity: "common", chance: 50 },
+      { emoji: "💰", name: "Мешок денег", value: 20, rarity: "rare", chance: 30 },
+      { emoji: "⭐", name: "Звезда", value: 50, rarity: "epic", chance: 15 },
+      { emoji: "💎", name: "Алмаз", value: 100, rarity: "legendary", chance: 5 }
+    ]
+
+    function getRandomItem(items) {
+      const totalChance = items.reduce((sum, item) => sum + item.chance, 0)
+      const random = Math.random() * totalChance
+
+      let cumulative = 0
+      for (const item of items) {
+        cumulative += item.chance
+        if (random <= cumulative) {
+          return item
+        }
+      }
+    }
+
+    const item = getRandomItem(items)
+
+    const newBalance = user.balance - cost + item.value
 
     await pool.query(
       'UPDATE users SET balance = $1 WHERE telegram_id = $2',
       [newBalance, telegram_id]
     )
 
-    await pool.query(
-      'INSERT INTO spins (telegram_id, case_type, cost, win) VALUES ($1, $2, $3, $4)',
-      [String(telegram_id), case_type, cost, win]
-    )
-
     res.json({
-      case_type,
-      cost,
-      win,
+      item,
       new_balance: newBalance
     })
 
