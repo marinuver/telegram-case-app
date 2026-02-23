@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const crypto = require('crypto')
 const cors = require('cors')
 const { Pool } = require('pg')
 
@@ -8,6 +9,29 @@ app.use(cors())
 app.use(express.json())
 
 const PORT = process.env.PORT || 3000
+
+function verifyTelegramData(initData) {
+  const secret = crypto
+    .createHash('sha256')
+    .update(process.env.BOT_TOKEN)
+    .digest()
+
+  const params = new URLSearchParams(initData)
+  const hash = params.get('hash')
+  params.delete('hash')
+
+  const dataCheckString = [...params.entries()]
+    .sort()
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')
+
+  const hmac = crypto
+    .createHmac('sha256', secret)
+    .update(dataCheckString)
+    .digest('hex')
+
+  return hmac === hash
+}
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -76,27 +100,28 @@ app.get('/history/:telegram_id', async (req, res) => {
 
 app.post('/auth', async (req, res) => {
   try {
-    const { telegram_id, username } = req.body
+    const { initData } = req.body
 
-    if (!telegram_id) {
-      return res.status(400).json({ error: "telegram_id required" })
+    if (!initData || !verifyTelegramData(initData)) {
+      return res.status(403).json({ error: "Invalid Telegram data" })
     }
 
-    // проверяем существует ли пользователь
-    let user = await pool.query(
+    const params = new URLSearchParams(initData)
+    const user = JSON.parse(params.get('user'))
+
+    let userResult = await pool.query(
       'SELECT * FROM users WHERE telegram_id = $1',
-      [telegram_id]
+      [user.id]
     )
 
-    // если нет — создаём
-    if (user.rows.length === 0) {
-      user = await pool.query(
+    if (userResult.rows.length === 0) {
+      userResult = await pool.query(
         'INSERT INTO users (telegram_id, username) VALUES ($1, $2) RETURNING *',
-        [telegram_id, username]
+        [user.id, user.username]
       )
     }
 
-    res.json(user.rows[0])
+    res.json(userResult.rows[0])
 
   } catch (err) {
     res.status(500).json({ error: err.message })
