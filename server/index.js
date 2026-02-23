@@ -142,6 +142,7 @@ app.post('/spin', async (req, res) => {
 
     const win = Math.floor(Math.random() * (maxWin - minWin + 1)) + minWin
     const newBalance = user.balance - cost + win
+    console.log("INSERTING SPIN:", telegram_id, case_type, cost, win)
 
     // обновляем баланс
     await pool.query(
