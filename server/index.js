@@ -11,23 +11,23 @@ app.use(express.json())
 
 function verifyTelegramData(initData) {
   const secret = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(process.env.BOT_TOKEN)
     .digest()
 
   const params = new URLSearchParams(initData)
-  const hash = params.get('hash')
-  params.delete('hash')
+  const hash = params.get("hash")
+  params.delete("hash")
 
   const dataCheckString = [...params.entries()]
     .sort()
     .map(([key, value]) => `${key}=${value}`)
-    .join('\n')
+    .join("\n")
 
   const hmac = crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(dataCheckString)
-    .digest('hex')
+    .digest("hex")
 
   return hmac === hash
 }
