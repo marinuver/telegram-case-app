@@ -159,21 +159,20 @@
 
   // 5️⃣ Через 1.5 секунды показываем реальный результат
   setTimeout(() => {
-    clearInterval(interval)
-    resultBlock.classList.remove("spin-animation")
+  clearInterval(interval)
 
-    resultBlock.innerText = data.win + " 🪙"
+  console.log(data) // временно для проверки
 
-    // Эффект увеличения
-    resultBlock.style.transform = "scale(1.4)"
+  resultBlock.innerText =
+    data.item.emoji + " " + data.item.value + " 🪙"
 
-    setTimeout(() => {
-      resultBlock.style.transform = "scale(1)"
-      spinBtn.disabled = false
-      auth() // обновляем баланс
-    }, 400)
+  resultBlock.className = ""
+  resultBlock.classList.add(data.item.rarity)
 
-  }, 1500)
+  spinBtn.disabled = false
+  auth()
+
+}, 1500)
 }
 
     auth()
