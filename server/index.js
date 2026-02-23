@@ -144,7 +144,7 @@ app.post('/spin', async (req, res) => {
     }
 
     const items = [
-      { emoji: "🪙", name: "Монета", value: 4, rarity: "common", chance: 40 },
+      { emoji: "🪙", name: "Монета", value: 40, rarity: "common", chance: 40 },
       { emoji: "💰", name: "Мешок денег", value: 80, rarity: "rare", chance: 30 },
       { emoji: "⭐", name: "Звезда", value: 120, rarity: "epic", chance: 20 },
       { emoji: "💎", name: "Алмаз", value: 250, rarity: "legendary", chance: 10 }
