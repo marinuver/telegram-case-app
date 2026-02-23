@@ -38,6 +38,35 @@ app.get('/users', async (req, res) => {
   }
 })
 
+app.post('/auth', async (req, res) => {
+  try {
+    const { telegram_id, username } = req.body
+
+    if (!telegram_id) {
+      return res.status(400).json({ error: "telegram_id required" })
+    }
+
+    // проверяем существует ли пользователь
+    let user = await pool.query(
+      'SELECT * FROM users WHERE telegram_id = $1',
+      [telegram_id]
+    )
+
+    // если нет — создаём
+    if (user.rows.length === 0) {
+      user = await pool.query(
+        'INSERT INTO users (telegram_id, username) VALUES ($1, $2) RETURNING *',
+        [telegram_id, username]
+      )
+    }
+
+    res.json(user.rows[0])
+
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 async function initDB() {
   try {
     const query =
