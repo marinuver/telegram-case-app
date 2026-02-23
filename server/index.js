@@ -52,6 +52,22 @@ app.get('/users', async (req, res) => {
   }
 })
 
+app.get('/history/:telegram_id', async (req, res) => {
+  try {
+    const { telegram_id } = req.params
+
+    const result = await pool.query(
+      'SELECT * FROM spins WHERE telegram_id = $1 ORDER BY created_at DESC',
+      [telegram_id]
+    )
+
+    res.json(result.rows)
+
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 app.post('/auth', async (req, res) => {
   try {
     const { telegram_id, username } = req.body
