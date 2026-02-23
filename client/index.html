@@ -199,6 +199,13 @@ function openTab(tabId) {
     }
 
     async function spin() {
+        const currentBalance =
+  parseInt(document.getElementById("balance").innerText)
+
+if (currentBalance < 100) {
+  alert("Недостаточно средств")
+  return
+}
   const user = tg.initDataUnsafe.user
   const resultBlock = document.getElementById("result")
   const spinBtn = document.getElementById("spinBtn")
@@ -268,3 +275,4 @@ historyList.prepend(entry)
 
 </body>
 </html>
+spin
