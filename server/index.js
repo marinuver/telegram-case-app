@@ -67,6 +67,70 @@ app.post('/auth', async (req, res) => {
   }
 })
 
+app.post('/spin', async (req, res) => {
+  try {
+    const { telegram_id, case_type } = req.body
+
+    if (!telegram_id || !case_type) {
+      return res.status(400).json({ error: "telegram_id and case_type required" })
+    }
+
+    const userResult = await pool.query(
+      'SELECT * FROM users WHERE telegram_id = $1',
+      [telegram_id]
+    )
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    const user = userResult.rows[0]
+
+    let cost = 0
+    let minWin = 0
+    let maxWin = 0
+
+    if (case_type === "cheap") {
+      cost = 100
+      minWin = 50
+      maxWin = 150
+    } else if (case_type === "medium") {
+      cost = 200
+      minWin = 100
+      maxWin = 400
+    } else if (case_type === "expensive") {
+      cost = 500
+      minWin = 100
+      maxWin = 700
+    } else {
+      return res.status(400).json({ error: "Invalid case type" })
+    }
+
+    if (user.balance < cost) {
+      return res.status(400).json({ error: "Not enough balance" })
+    }
+
+    const win = Math.floor(Math.random() * (maxWin - minWin + 1)) + minWin
+
+    const newBalance = user.balance - cost + win
+
+    await pool.query(
+      'UPDATE users SET balance = $1 WHERE telegram_id = $2',
+      [newBalance, telegram_id]
+    )
+
+    res.json({
+      case_type,
+      cost,
+      win,
+      new_balance: newBalance
+    })
+
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 async function initDB() {
   try {
     const query =
