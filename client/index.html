@@ -229,6 +229,12 @@ function openTab(tabId) {
   })
 
   const data = await response.json()
+  // === ЕСЛИ ОШИБКА ===
+if (!response.ok) {
+  alert(data.error)
+  spinBtn.disabled = false
+  return
+}
 
   // 5️⃣ Через 1.5 секунды показываем реальный результат
   setTimeout(() => {
