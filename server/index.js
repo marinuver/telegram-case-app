@@ -7,6 +7,7 @@ const { Pool } = require('pg')
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.use(express.static('client'))
 
 const PORT = process.env.PORT || 3000
 
