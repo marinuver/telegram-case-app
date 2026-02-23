@@ -144,10 +144,10 @@ app.post('/spin', async (req, res) => {
     }
 
     const items = [
-      { emoji: "🪙", name: "Монета", value: 5, rarity: "common", chance: 50 },
-      { emoji: "💰", name: "Мешок денег", value: 20, rarity: "rare", chance: 30 },
-      { emoji: "⭐", name: "Звезда", value: 50, rarity: "epic", chance: 15 },
-      { emoji: "💎", name: "Алмаз", value: 100, rarity: "legendary", chance: 5 }
+      { emoji: "🪙", name: "Монета", value: 4, rarity: "common", chance: 40 },
+      { emoji: "💰", name: "Мешок денег", value: 80, rarity: "rare", chance: 30 },
+      { emoji: "⭐", name: "Звезда", value: 120, rarity: "epic", chance: 20 },
+      { emoji: "💎", name: "Алмаз", value: 250, rarity: "legendary", chance: 10 }
     ]
 
     function getRandomItem(items) {
