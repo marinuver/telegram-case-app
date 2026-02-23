@@ -129,7 +129,6 @@ app.post('/auth', async (req, res) => {
 
 app.post('/spin', async (req, res) => {
   try {
-    const { telegram_id } = req.body
 
     const userResult = await pool.query(
       'SELECT * FROM users WHERE telegram_id = $1',
@@ -137,18 +136,45 @@ app.post('/spin', async (req, res) => {
     )
 
     const user = userResult.rows[0]
-    const cost = 100
+    const { telegram_id, case_type } = req.body
+
+let cost
+let items
+
+if (case_type === "common") {
+  cost = 100
+  items = [
+    { emoji: "🪙", name: "Монета", value: 10, chance: 60 },
+    { emoji: "💰", name: "Мешок", value: 40, chance: 30 },
+    { emoji: "⭐", name: "Звезда", value: 120, chance: 10 }
+  ]
+}
+
+else if (case_type === "rare") {
+  cost = 250
+  items = [
+    { emoji: "💰", name: "Мешок", value: 80, chance: 50 },
+    { emoji: "⭐", name: "Звезда", value: 200, chance: 35 },
+    { emoji: "💎", name: "Алмаз", value: 400, chance: 15 }
+  ]
+}
+
+else if (case_type === "epic") {
+  cost = 500
+  items = [
+    { emoji: "⭐", name: "Звезда", value: 300, chance: 50 },
+    { emoji: "💎", name: "Алмаз", value: 700, chance: 35 },
+    { emoji: "👑", name: "Корона", value: 1500, chance: 15 }
+  ]
+}
+
+else {
+  return res.status(400).json({ error: "Неизвестный кейс" })
+}
 
     if (!user || user.balance < cost) {
       return res.status(400).json({ error: "Недостаточно средств" })
     }
-
-    const items = [
-      { emoji: "🪙", name: "Монета", value: 40, rarity: "common", chance: 40 },
-      { emoji: "💰", name: "Мешок денег", value: 80, rarity: "rare", chance: 30 },
-      { emoji: "⭐", name: "Звезда", value: 120, rarity: "epic", chance: 20 },
-      { emoji: "💎", name: "Алмаз", value: 250, rarity: "legendary", chance: 10 }
-    ]
 
     function getRandomItem(items) {
       const totalChance = items.reduce((sum, item) => sum + item.chance, 0)

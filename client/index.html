@@ -138,17 +138,27 @@
   <div class="app">
 
   <!-- ВКЛАДКА КЕЙСЫ -->
-  <div id="casesTab" class="tab active">
-    <h2>🎁 Кейсы</h2>
-
-    <div class="case-card">
-      <h3>Обычный кейс</h3>
-      <p>Стоимость: 100 🪙</p>
-      <button id="spinBtn" onclick="spin()">Крутить кейс</button>
-    </div>
-
-    <div id="result" class="result">🎰</div>
+  <div class="case-card">
+    <h3>🟢 Обычный</h3>
+    <p>100 🪙</p>
+    <button onclick="spin('common')">Открыть</button>
   </div>
+
+  <div class="case-card">
+    <h3>🔵 Редкий</h3>
+    <p>250 🪙</p>
+    <button onclick="spin('rare')">Открыть</button>
+  </div>
+
+  <div class="case-card">
+    <h3>🟣 Эпик</h3>
+    <p>500 🪙</p>
+    <button onclick="spin('epic')">Открыть</button>
+  </div>
+
+  <div id="result" class="result">🎰</div>
+
+</div>
 
   <!-- ВКЛАДКА ИСТОРИЯ -->
   <div id="historyTab" class="tab">
@@ -198,7 +208,7 @@ function openTab(tabId) {
       document.getElementById("balance").innerText = data.balance
     }
 
-    async function spin() {
+    async function spin(caseType) {
         const currentBalance =
   parseInt(document.getElementById("balance").innerText)
 
@@ -231,7 +241,7 @@ if (currentBalance < 100) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       telegram_id: user.id,
-      case_type: "cheap"
+      case_type: caseType
     })
   })
 
