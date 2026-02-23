@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 3000
 const app = express()
 app.use(cors())
 app.use(express.json())
-app.use(express.static('client'))
 
 function verifyTelegramData(initData) {
   const secret = crypto
@@ -200,6 +199,8 @@ async function initDB() {
 }
 
 initDB()
+
+app.use(express.static('client'))
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`)
