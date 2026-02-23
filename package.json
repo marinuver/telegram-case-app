@@ -1,24 +1,17 @@
 {
-  "name": "telegram-case-app",
+  "name": "tg-shop",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Telegram Mini App Shop",
+  "main": "server.js",
   "scripts": {
-  "start": "node server/index.js",
-  "dev": "nodemon server/index.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "pg": "^8.18.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "node-telegram-bot-api": "^0.66.0",
+    "sql.js": "^1.11.0"
   }
 }

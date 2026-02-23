@@ -1,0 +1,43 @@
+const TelegramBot = require('node-telegram-bot-api');
+
+const BOT_TOKEN = '7601773904:AAHo2-ag-xMI9dbKgXrvYjPy2nsoQw-Uumg';
+const WEB_APP_URL = 'https://nonpsychologically-sulcate-jalen.ngrok-free.dev';
+
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
+
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const firstName = msg.from.first_name || 'друг';
+
+    bot.sendMessage(chatId, `Привет, ${firstName}! 👋\n\nДобро пожаловать в наш магазин! Нажми кнопку ниже чтобы открыть каталог 🛒`, {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: '🛒 Открыть магазин',
+                        web_app: { url: WEB_APP_URL }
+                    }
+                ]
+            ]
+        }
+    });
+});
+
+bot.onText(/\/help/, (msg) => {
+    bot.sendMessage(msg.chat.id,
+        `📋 *Помощь*\n\n` +
+        `/start — Открыть магазин\n` +
+        `/help — Помощь\n\n` +
+        `Нажми кнопку ниже чтобы перейти в магазин! 👇`,
+        {
+            parse_mode: 'Markdown',
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: '🛒 Открыть магазин', web_app: { url: WEB_APP_URL } }]
+                ]
+            }
+        }
+    );
+});
+
+console.log('🤖 Bot is running...');
