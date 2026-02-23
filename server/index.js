@@ -16,6 +16,20 @@ const pool = new Pool({
   }
 })
 
+// Автоматическое создание таблицы spins
+pool.query(`
+  CREATE TABLE IF NOT EXISTS spins (
+    id SERIAL PRIMARY KEY,
+    telegram_id VARCHAR(255) NOT NULL,
+    case_type VARCHAR(50) NOT NULL,
+    cost INTEGER NOT NULL,
+    win INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`)
+.then(() => console.log("Spins table ready"))
+.catch(err => console.error("Error creating spins table:", err))
+
 app.get('/', (req, res) => {
   res.send('Backend работает ')
 })
