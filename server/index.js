@@ -116,6 +116,11 @@ app.post('/spin', async (req, res) => {
       [telegram_id]
     )
 
+     if (userResult.rows.length === 0) {
+      await client.query('ROLLBACK')
+      return res.status(404).json({ error: "User not found" })
+    }
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" })
     }
@@ -143,6 +148,7 @@ app.post('/spin', async (req, res) => {
     }
 
     if (user.balance < cost) {
+      await client.query('ROLLBACK')
       return res.status(400).json({ error: "Not enough balance" })
     }
 
@@ -170,7 +176,10 @@ app.post('/spin', async (req, res) => {
     })
 
   } catch (err) {
+    await client.query('ROLLBACK')
     res.status(500).json({ error: err.message })
+  } finally {
+    client.release()
   }
 })
 
