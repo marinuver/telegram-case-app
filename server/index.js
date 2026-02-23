@@ -12,7 +12,7 @@ const crypto = require('crypto')
 
 function verifyTelegramData(initData) {
   const secretKey = crypto
-    .createHash("sha256")
+    .createHmac("sha256", "WebAppData")
     .update(process.env.BOT_TOKEN)
     .digest()
 
