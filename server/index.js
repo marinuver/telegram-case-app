@@ -1,6 +1,5 @@
 require('dotenv').config()
 const express = require('express')
-const crypto = require('crypto')
 const cors = require('cors')
 const { Pool } = require('pg')
 const PORT = process.env.PORT || 3000
@@ -9,23 +8,25 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+const crypto = require('crypto')
+
 function verifyTelegramData(initData) {
-  const secret = crypto
+  const secretKey = crypto
     .createHash("sha256")
     .update(process.env.BOT_TOKEN)
     .digest()
 
-  const params = new URLSearchParams(initData)
-  const hash = params.get("hash")
-  params.delete("hash")
+  const urlParams = new URLSearchParams(initData)
+  const hash = urlParams.get("hash")
+  urlParams.delete("hash")
 
-  const dataCheckString = [...params.entries()]
-    .sort()
+  const dataCheckString = Array.from(urlParams.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([key, value]) => `${key}=${value}`)
     .join("\n")
 
   const hmac = crypto
-    .createHmac("sha256", secret)
+    .createHmac("sha256", secretKey)
     .update(dataCheckString)
     .digest("hex")
 
